@@ -1,22 +1,30 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
-import { Button, Card } from "react-bootstrap"; // Corrected import statement
+import { Button, Card, Alert } from "react-bootstrap"; // Corrected import statement
 import "bootstrap/dist/css/bootstrap.min.css"; // Added import statement
 import { addToCart } from "../Store/cartSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchP } from "../Store/apiSlice";
+import { getProducts } from "../Store/apiSlice";
+import StatusCode from "../Utilities/StatusCode";
 
 const Products = () => {
   const dispatch = useDispatch();
 
-  const { products } = useSelector((state) => state.api);
+  const { products, status } = useSelector((state) => state.api);
   useEffect(() => {
-    dispatch(fetchP());
+    dispatch(getProducts());
   }, []);
 
   const add = (product) => {
     dispatch(addToCart(product));
   };
+
+  if (status === StatusCode.LOADING) {
+    return <div>Loading...</div>;
+  }
+  if (status === StatusCode.ERROR) {
+    return <Alert variant="danger">Error...</Alert>;
+  }
 
   const card = products.map((product) => (
     <div className="col-lg-3 col-md-4 col-sm-6 mb-3" key={product.id}>
